@@ -40,11 +40,21 @@ func main() {
 		httpServer.Run()
 	}()
 
+		backgroundJiraFetcher := jiraFetcher.New(
+		logger,
+		jiraFetcher,
+	
+
+	go func() {
+		backgroundJiraFether.Run(ctx)
+	}()
+
 	<-ctx.Done()
 
 	log.Println("Initializing graceful shutdown")
 
 	httpServer.Stop()
+	backgroundJiraFether.Stop()
 
 	log.Println("Shutdown complete")
 }

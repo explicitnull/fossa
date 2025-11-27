@@ -1,5 +1,5 @@
 build:
-	go build -o ./bin/fossa ./cmd/server
+	go build -o ./bin/fossa .
 
 run: build
-	./bin/fossa -config=config/config.yaml
+	./bin/fossa 

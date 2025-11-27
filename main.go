@@ -4,12 +4,19 @@ import (
 	"context"
 	"fossa/api/httpserver"
 	"fossa/pkg/logging"
+	"fossa/pkg/sqlite"
+	"fossa/service/template"
+	"fossa/service/ticket"
 	"log"
 	"os/signal"
 	"syscall"
 
-	"github.com/explicitnull/promcommon"
+	"fossa/repository/templaterepo"
+	"fossa/repository/ticketrepo"
+	// go-jira "github.com/andygrunwald/go-jira/v1"
 )
+
+const jiraURL = "https://cenic.atlassion.com/jira/"
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -20,41 +27,52 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	logger, err := logging.NewLogger(&cfg.Logger, cfg.App.Name, promcommon.NewLoggerMetrics())
+	logger, err := logging.NewLogger(&cfg.Logger, cfg.App.Name)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	ctx = logging.PackContext(ctx, logger)
 
-	// insert sqlite init
+	sqliteConn, err := sqlite.NewDB()
+	if err != nil {
+		logger.Fatal("Can't initialize SQLite")
+	}
 
-	// jira client init
+	// jiraClient, err := jira.NewClient(nil, "https://issues.apache.org/jira/")
+	// if err != nil {
+	// 	logger.Fatal("Can't initialize Jira")
+	// }
 
-	templatesRepository := templatesrepo.NewDB(sqliteConn)
-	ticketsRepository := ticketsrepo.NewDB(sqliteConn)
+	// _ = jiraClient
 
-	httpServer := httpserver.New()
+	templatesRepository := templaterepo.NewSQLite(sqliteConn)
+	ticketsRepository := ticketrepo.NewSQLite(sqliteConn)
+
+	templatesService := template.NewService(templatesRepository)
+	ticketsService := ticket.NewService(ticketsRepository, templatesService)
+
+	httpServer := httpserver.New(cfg.HTTPServer, ticketsService)
 
 	go func() {
 		httpServer.Run()
 	}()
 
-		backgroundJiraFetcher := jiraFetcher.New(
-		logger,
-		jiraFetcher,
-	
+	// backgroundJiraFetcher := jiraFetcher.New(
+	// 	logger,
+	// 	jiraFetcher,
+	// )
 
-	go func() {
-		backgroundJiraFether.Run(ctx)
-	}()
+	// go func() {
+	// 	backgroundJiraFetcher.Run(ctx)
+	// }()
 
 	<-ctx.Done()
 
-	log.Println("Initializing graceful shutdown")
+	logger.Warn("Initializing graceful shutdown")
 
 	httpServer.Stop()
-	backgroundJiraFether.Stop()
+	// backgroundJiraFetcher.Stop()
 
-	log.Println("Shutdown complete")
+	logger.Warn("Shutdown complete")
 }

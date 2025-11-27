@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"github.com/explicitnull/promcommon"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
@@ -20,7 +19,7 @@ type Config struct {
 	Development bool   `yaml:"development" env:"DEVELOPMENT"`
 }
 
-func NewLogger(cfg *Config, appName string, metrics promcommon.LoggerIncrementer) (*Logger, error) {
+func NewLogger(cfg *Config, appName string) (*Logger, error) {
 	if cfg == nil {
 		return nil, errors.New("no configuration provided")
 	}
@@ -39,9 +38,9 @@ func NewLogger(cfg *Config, appName string, metrics promcommon.LoggerIncrementer
 	zapLogger.Info("starting microservice...")
 
 	return &Logger{
-		logger:  zapLogger.Sugar(),
-		metrics: metrics,
-		fields:  map[string]interface{}{},
+		logger: zapLogger.Sugar(),
+		// metrics: metrics,
+		fields: map[string]interface{}{},
 	}, nil
 }
 

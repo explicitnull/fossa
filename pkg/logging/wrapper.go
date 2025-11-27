@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"github.com/explicitnull/promcommon"
 	"go.uber.org/zap"
 )
 
@@ -13,8 +12,8 @@ const (
 )
 
 type Logger struct {
-	logger  *zap.SugaredLogger
-	metrics promcommon.LoggerIncrementer
+	logger *zap.SugaredLogger
+	// metrics promcommon.LoggerIncrementer
 
 	fields map[string]interface{}
 }
@@ -22,17 +21,17 @@ type Logger struct {
 // Deprecated: Use WithContext.
 func (log *Logger) With(fields ...interface{}) *Logger {
 	return &Logger{
-		logger:  log.logger.With(fields...),
-		metrics: log.metrics,
-		fields:  log.copyFields(),
+		logger: log.logger.With(fields...),
+		// metrics: log.metrics,
+		fields: log.copyFields(),
 	}
 }
 
 func (log *Logger) WithContext(key string, obj any) *Logger {
 	newLogger := &Logger{
-		logger:  log.logger,
-		metrics: log.metrics,
-		fields:  log.copyFields(),
+		logger: log.logger,
+		// metrics: log.metrics,
+		fields: log.copyFields(),
 	}
 
 	newLogger.fields[key] = obj
@@ -63,17 +62,17 @@ func (log *Logger) Info(msg string, keysAndValues ...interface{}) {
 }
 
 func (log *Logger) Warn(msg string, keysAndValues ...interface{}) {
-	if log.metrics != nil {
-		log.metrics.IncLogWarns()
-	}
+	// if log.metrics != nil {
+	// 	log.metrics.IncLogWarns()
+	// }
 
 	log.withContext().Warnw(msg, keysAndValues...)
 }
 
 func (log *Logger) Error(msg string, keysAndValues ...interface{}) {
-	if log.metrics != nil {
-		log.metrics.IncLogErrors()
-	}
+	// if log.metrics != nil {
+	// 	log.metrics.IncLogErrors()
+	// }
 
 	log.withContext().Errorw(msg, keysAndValues...)
 }

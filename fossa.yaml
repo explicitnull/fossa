@@ -1,0 +1,15 @@
+app:
+  name: "fossa"
+  env: "dev" 
+
+logger:
+  debug: "false"
+  level: "debug"
+  time_encoder: "epoch"
+
+http:
+  addr: "0.0.0.0"
+  port: 8082
+  readTimeout: "100ms"
+  writeTimeout: "100ms"
+  idleTimeout: "100ms"

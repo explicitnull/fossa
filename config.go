@@ -2,21 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"fossa/api/httpserver"
 	"fossa/pkg/logging"
 	"os"
 
 	"github.com/pkg/errors"
-	"gorm.io/driver/postgres"
 )
 
 const defaultConfFileName = "fossa.conf"
 
 type Config struct {
-	App        AppConfig         `yaml:"app"`
-	Logger     logging.Config    `yaml:"logger"`
-	Postgres   postgres.Config   `yaml:"postgres"`
+	App    AppConfig      `yaml:"app"`
+	Logger logging.Config `yaml:"logger"`
+	// Postgres   postgres.Config   `yaml:"postgres"`
 	HTTPServer httpserver.Config `yaml:"http"`
-	SignIn     security.Config   `yaml:"sign_in"`
+	// SignIn     security.Config   `yaml:"sign_in"`
 }
 
 type AppConfig struct {

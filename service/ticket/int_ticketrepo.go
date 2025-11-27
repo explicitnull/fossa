@@ -5,5 +5,5 @@ import (
 )
 
 type TicketRepository interface {
-	FetchAll(ctx context.Context) ([]Ticket, error)
+	FetchTickets(ctx context.Context) ([]Ticket, error)
 }

@@ -3,6 +3,7 @@ package httpserver
 import (
 	"context"
 	"errors"
+	"fossa/service/ticket"
 	"log"
 	"net/http"
 	"time"
@@ -12,16 +13,29 @@ import (
 
 const port = ":8080"
 
+type Config struct {
+	Address               string `env:"ADDRESS" yaml:"address"`
+	Port                  string `env:"PORT" yaml:"port"`
+	AuthenticationEnabled bool   `env:"AUTHENTICATION_ENABLED" yaml:"authentication_enabled"`
+	// JwtPublicKey          string `env:"JWT_PUBLIC_KEY" yaml:"jwt_public_key"`
+	// JwtPublicKeyParsed    crypto.PublicKey
+}
+
 const (
 	gracefulTimeout = time.Second * 15
 )
 
 type Server struct {
+	config Config
+
 	stdserver *http.Server
 	engine    *gin.Engine
+
+	ticketService *ticket.Service
 }
 
-func New() *Server {
+func New(config Config, ticketService *ticket.Service) *Server {
+	// Disabling gin logs
 	gin.SetMode(gin.ReleaseMode)
 
 	engine := gin.New()
@@ -34,23 +48,28 @@ func New() *Server {
 	}
 
 	return &Server{
-		stdserver: stdserver,
-		engine:    engine,
+		config:        config,
+		stdserver:     stdserver,
+		engine:        engine,
+		ticketService: ticketService,
 	}
 }
-
-func (s *Server) Run() {
+func (s *Server) setupRoutes() {
 	// add metrics and liveness check
 	apiv1 := s.engine.Group("/api/v1")
 
 	ticketsGroup := apiv1.Group("/tickets")
-	ticketsGroup.GET("/test", s.GetTickets)
+	ticketsGroup.GET("/", s.GetTickets)
+}
 
-	log.Println("Running server on", port)
+func (s *Server) Run() {
+	log.Println("Running server on ", port)
+
+	s.setupRoutes()
 
 	err := s.stdserver.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalln("can't listen and serve:", err)
+		log.Fatalln("Can't listen and serve: ", err)
 	}
 }
 
@@ -60,6 +79,6 @@ func (s *Server) Stop() {
 
 	err := s.stdserver.Shutdown(ctx)
 	if err != nil {
-		log.Println("can't shutdown http server: ", err)
+		log.Println("Can't shutdown http server: ", err)
 	}
 }

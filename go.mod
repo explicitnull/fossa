@@ -4,18 +4,20 @@ go 1.22.6
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/andygrunwald/go-jira v1.17.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/ncruces/go-sqlite3 v0.20.1
 	github.com/pkg/errors v0.9.1
+	github.com/stretchr/testify v1.8.3
 	go.uber.org/zap v1.27.1
 )
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/andygrunwald/go-jira v1.17.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -24,7 +26,6 @@ require (
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -38,6 +39,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/tetratelabs/wazero v1.8.1 // indirect
 	github.com/trivago/tgo v1.0.7 // indirect

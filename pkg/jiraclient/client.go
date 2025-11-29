@@ -15,9 +15,9 @@ const (
 )
 
 type Config struct {
-	Username string `yaml:"username"`
-	APIToken string `yaml:"api_token"`
-	URL      string `yaml:"url"`
+	Username string `env:"JIRA_USERNAME"`
+	APIToken string `env:"JIRA_API_TOKEN"`
+	URL      string `env:"JIRA_URL"`
 }
 
 type Client struct {

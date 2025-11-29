@@ -2,6 +2,7 @@ package main
 
 import (
 	"fossa/api/httpserver"
+	"fossa/pkg/jiraclient"
 	"fossa/pkg/logging"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -16,6 +17,7 @@ type Config struct {
 	// Postgres   postgres.Config   `yaml:"postgres"`
 	HTTPServer httpserver.Config `yaml:"http"`
 	// SignIn     security.Config   `yaml:"sign_in"`
+	Jira jiraclient.Config `yaml:"jira"`
 }
 
 type AppConfig struct {

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fossa/api/httpserver"
+	"fossa/background/assetrefresher"
+	"fossa/pkg/jiraclient"
 	"fossa/pkg/logging"
 	"fossa/pkg/sqlite"
 	"fossa/service/template"
@@ -13,10 +15,7 @@ import (
 
 	"fossa/repository/templaterepo"
 	"fossa/repository/ticketrepo"
-	// go-jira "github.com/andygrunwald/go-jira/v1"
 )
-
-const jiraURL = "https://cenic.atlassion.com/jira/"
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -39,18 +38,16 @@ func main() {
 		logger.Fatal("Can't initialize SQLite")
 	}
 
-	// jiraClient, err := jira.NewClient(nil, "https://issues.apache.org/jira/")
-	// if err != nil {
-	// 	logger.Fatal("Can't initialize Jira")
-	// }
-
-	// _ = jiraClient
+	jiraClient, err := jiraclient.New(cfg.Jira)
+	if err != nil {
+		logger.Fatal("Can't initialize Jira")
+	}
 
 	templatesRepository := templaterepo.NewSQLite(sqliteConn)
 	ticketsRepository := ticketrepo.NewSQLite(sqliteConn)
 
 	templatesService := template.NewService(templatesRepository)
-	ticketsService := ticket.NewService(ticketsRepository, templatesService)
+	ticketsService := ticket.NewService(ticketsRepository, templatesService, jiraClient)
 
 	httpServer := httpserver.New(cfg.HTTPServer, ticketsService)
 
@@ -58,21 +55,21 @@ func main() {
 		httpServer.Run()
 	}()
 
-	// backgroundJiraFetcher := jiraFetcher.New(
-	// 	logger,
-	// 	jiraFetcher,
-	// )
+	backgroundassetrefresher := assetrefresher.New(
+		ticketsService,
+		logger,
+	)
 
-	// go func() {
-	// 	backgroundJiraFetcher.Run(ctx)
-	// }()
+	go func() {
+		backgroundassetrefresher.Run(ctx)
+	}()
 
 	<-ctx.Done()
 
-	logger.Warn("Initializing graceful shutdown")
+	logger.Warn("System signal received, initializing graceful shutdown")
 
 	httpServer.Stop()
-	// backgroundJiraFetcher.Stop()
+	// backgroundassetrefresher.Stop()
 
 	logger.Warn("Shutdown complete")
 }

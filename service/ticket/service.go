@@ -51,6 +51,16 @@ func (s *Service) FetchTicketsFromDB(ctx context.Context) ([]Ticket, error) {
 	return settings, nil
 }
 
+func (s *Service) FetchTicketsFromJira(ctx context.Context) ([]Ticket, error) {
+	tickets, err := s.jiraClient.FetchTicketsFromJira(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "can't fetch tickets from Jira")
+	}
+
+	return tickets, nil
+
+}
+
 func (s *Service) GenerateTexts(ctx context.Context) error {
 	tickets, err := s.jiraClient.FetchTicketsFromJira(ctx)
 	if err != nil {

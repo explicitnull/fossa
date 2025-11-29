@@ -11,7 +11,7 @@ import (
 func NewDB() (*sql.DB, error) {
 	var version string
 
-	db, err := sql.Open("sqlite3", "file:fossa.db")
+	db, err := sql.Open("sqlite3", "file:db/fossa.db")
 	if err != nil {
 		return nil, err
 	}

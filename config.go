@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const defaultConfFileName = "fossa.conf"
+const defaultConfFileName = "fossa.yaml"
 
 type Config struct {
 	App    AppConfig      `yaml:"app"`

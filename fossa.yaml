@@ -15,6 +15,6 @@ http:
   idleTimeout: "100ms"
 
 jira:
-  url: "https://cenic.atlassian.net"
+  url:
   email: ""
   api_token: ""

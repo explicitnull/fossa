@@ -38,6 +38,8 @@ func main() {
 		logger.Fatal("Can't initialize SQLite")
 	}
 
+	logger.Debug("Jira config: %v", cfg.Jira)
+
 	jiraClient, err := jiraclient.New(cfg.Jira)
 	if err != nil {
 		logger.Fatal("Can't initialize Jira")
@@ -55,13 +57,13 @@ func main() {
 		httpServer.Run()
 	}()
 
-	backgroundassetrefresher := assetrefresher.New(
+	backgroundAssetRefresher := assetrefresher.New(
 		ticketsService,
 		logger,
 	)
 
 	go func() {
-		backgroundassetrefresher.Run(ctx)
+		backgroundAssetRefresher.Run(ctx)
 	}()
 
 	<-ctx.Done()

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const updateInterval = 1 * time.Minute
+const updateInterval = 10 * time.Second
 
 type Refresher struct {
 	tkr           *time.Ticker
@@ -24,7 +24,11 @@ func New(ticketService *ticket.Service, logger *logging.Logger) *Refresher {
 }
 
 func (r *Refresher) Run(ctx context.Context) {
+	r.logger.Info("Asset refresher started")
+
 	for range r.tkr.C {
+		r.logger.Info("Asset refresher tick")
+
 		err := r.ticketService.GenerateTexts(ctx)
 		if err != nil {
 			r.logger.Error("Error generating texts: %v", err)

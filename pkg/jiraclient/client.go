@@ -15,9 +15,9 @@ const (
 )
 
 type Config struct {
-	ServiceUsername string `yaml:"service_username"`
-	APIToken        string `yaml:"api_token"`
-	URL             string `yaml:"url"`
+	Username string `yaml:"username"`
+	APIToken string `yaml:"api_token"`
+	URL      string `yaml:"url"`
 }
 
 type Client struct {
@@ -26,7 +26,7 @@ type Client struct {
 
 func New(config Config) (*Client, error) {
 	tp := jira.BasicAuthTransport{
-		Username: config.ServiceUsername,
+		Username: config.Username,
 		Password: config.APIToken,
 	}
 
@@ -35,10 +35,14 @@ func New(config Config) (*Client, error) {
 		return nil, errors.Wrap(err, "can't create Jira client: %v\n")
 	}
 
+	fmt.Printf("Jira client created for user %s\n", config.Username)
+
 	return &Client{client: client}, nil
 }
 
 func (c *Client) FetchTicketsFromJira(ctx context.Context) ([]ticket.Ticket, error) {
+	fmt.Println("Fetching tickets from Jira")
+
 	options := &jira.SearchOptionsV2{
 		MaxResults: maxSearchResults,
 		Fields:     []string{"summary", "status", "assignee"},

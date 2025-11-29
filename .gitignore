@@ -33,3 +33,4 @@ go.work.sum
 
 go.sum
 db/
+fossa.yaml

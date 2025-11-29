@@ -13,3 +13,7 @@ http:
   readTimeout: "100ms"
   writeTimeout: "100ms"
   idleTimeout: "100ms"
+
+jira:
+  url: "https://cenic.atlassian.net"
+  email: "

@@ -16,4 +16,5 @@ http:
 
 jira:
   url: "https://cenic.atlassian.net"
-  email: "
+  email: ""
+  api_token: ""

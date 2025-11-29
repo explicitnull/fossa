@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"fossa/api/httpserver"
 	"fossa/pkg/jiraclient"
 	"fossa/pkg/logging"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/pkg/errors"
 )
 
 const defaultConfFileName = "fossa.yaml"
@@ -17,7 +17,7 @@ type Config struct {
 	// Postgres   postgres.Config   `yaml:"postgres"`
 	HTTPServer httpserver.Config `yaml:"http"`
 	// SignIn     security.Config   `yaml:"sign_in"`
-	Jira jiraclient.Config `yaml:"jira"`
+	Jira jiraclient.Config //`env:"jira"`
 }
 
 type AppConfig struct {
@@ -32,13 +32,18 @@ type Server struct {
 
 func NewConfig(path string) (*Config, error) {
 	var conf Config
+	var jiraConfig jiraclient.Config
 
 	// for faster config reload I want to read JSON via HTTP from consul in future
 
 	if err := cleanenv.ReadConfig(path, &conf); err != nil {
-		return nil, errors.Wrap(err, "can't parse config")
+		return nil, fmt.Errorf("cant load config %v", err)
 	}
 
+	if err := cleanenv.ReadConfig(".env", &jiraConfig); err != nil {
+		return nil, fmt.Errorf("cant load env data to config %v", err)
+	}
+	conf.Jira = jiraConfig
 	// confBytes, err := os.ReadFile(path)
 	// if err != nil {
 	// 	return nil, errors.Wrap(err, "can't read configuration")

@@ -62,5 +62,14 @@ func (s *SQLite) FetchTickets(ctx context.Context) ([]ticket.Ticket, error) {
 		results = append(results, t)
 	}
 
+	// TODO: remove mock data
+	t := ticket.Ticket{
+		ID:          "NET-1000",
+		Title:       "Install Optics and Connect Two CENIC Devices",
+		Description: "Please install the optics and connect the two CENIC devices as per the instructions.\n\nFor automation:\n  device_a_port: ge-1/0/1\n  device_b_port: ge-1/0/2\n  interface_speed: 10G",
+	}
+
+	results = append(results, t)
+
 	return results, nil
 }

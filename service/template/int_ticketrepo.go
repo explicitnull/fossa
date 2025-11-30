@@ -5,5 +5,5 @@ import (
 )
 
 type TemplateRepository interface {
-	FetchTemplatesByName(ctx context.Context, name string) ([]Template, error)
+	FetchTemplatesByJobType(ctx context.Context, jobType string) ([]Template, error)
 }

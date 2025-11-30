@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/andygrunwald/go-jira v1.17.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/goccy/go-yaml v1.19.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/ncruces/go-sqlite3 v0.20.1
 	github.com/pkg/errors v0.9.1

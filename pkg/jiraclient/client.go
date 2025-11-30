@@ -40,7 +40,7 @@ func New(config Config) (*Client, error) {
 	return &Client{client: client}, nil
 }
 
-func (c *Client) FetchTicketsFromJira(ctx context.Context) ([]ticket.Ticket, error) {
+func (c *Client) FetchTickets(ctx context.Context) ([]ticket.Ticket, error) {
 	fmt.Println("Fetching tickets from Jira")
 
 	options := &jira.SearchOptionsV2{
@@ -73,4 +73,22 @@ func (c *Client) FetchTicketsFromJira(ctx context.Context) ([]ticket.Ticket, err
 
 	return tt, nil
 
+}
+
+func (c *Client) FetchTicketDetails(ctx context.Context, ticketID string) (*ticket.Ticket, error) {
+	issue, resp, err := c.client.Issue.GetWithContext(ctx, ticketID, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "fetch issue")
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.Errorf("non-200 response: %d", resp.StatusCode)
+	}
+
+	t := &ticket.Ticket{
+		ID:          issue.Key,
+		Title:       issue.Fields.Summary,
+		Description: issue.Fields.Description,
+	}
+
+	return t, nil
 }

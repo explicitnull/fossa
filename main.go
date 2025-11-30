@@ -7,6 +7,7 @@ import (
 	"fossa/pkg/jiraclient"
 	"fossa/pkg/logging"
 	"fossa/pkg/sqlite"
+	"fossa/service/asset"
 	"fossa/service/template"
 	"fossa/service/ticket"
 	"log"
@@ -50,6 +51,7 @@ func main() {
 
 	templatesService := template.NewService(templatesRepository)
 	ticketsService := ticket.NewService(ticketsRepository, templatesService, jiraClient)
+	assetService := asset.NewService(nil, templatesService)
 
 	httpServer := httpserver.New(cfg.HTTPServer, ticketsService)
 
@@ -59,6 +61,7 @@ func main() {
 
 	backgroundAssetRefresher := assetrefresher.New(
 		ticketsService,
+		assetService,
 		logger,
 	)
 

@@ -20,7 +20,7 @@ type Ticket struct {
 func (s *Server) GetTickets(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	tickets, err := s.ticketService.FetchTicketsFromDB(ctx)
+	tickets, err := s.ticketService.FetchTicketsFromJira(ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, c.Error(err))
 

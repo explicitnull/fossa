@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const updateInterval = 10 * time.Second
+const updateInterval = 10 * time.Minute
 
 type Refresher struct {
 	tkr           *time.Ticker

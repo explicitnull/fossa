@@ -18,8 +18,8 @@ func NewService(
 	}
 }
 
-func (s *Service) FetchTemplates(ctx context.Context, name string) ([]Template, error) {
-	templates, err := s.repository.FetchTemplatesByJobType(ctx, name)
+func (s *Service) FetchTemplatesByJobType(ctx context.Context, jobType string) ([]Template, error) {
+	templates, err := s.repository.FetchTemplatesByJobType(ctx, jobType)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't get templates")
 	}

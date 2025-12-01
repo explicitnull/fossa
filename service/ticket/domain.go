@@ -13,5 +13,5 @@ type Ticket struct {
 	Assignee    string
 	history.HistoryData
 
-	TemplateVariables map[string]string
+	TemplateVariables map[string]interface{}
 }

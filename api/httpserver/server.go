@@ -3,6 +3,8 @@ package httpserver
 import (
 	"context"
 	"errors"
+	"fossa/pkg/logging"
+	"fossa/service/asset"
 	"fossa/service/ticket"
 	"log"
 	"net/http"
@@ -27,14 +29,16 @@ const (
 
 type Server struct {
 	config Config
+	logger *logging.Logger
 
 	stdserver *http.Server
 	engine    *gin.Engine
 
 	ticketService *ticket.Service
+	assetService  *asset.Service
 }
 
-func New(config Config, ticketService *ticket.Service) *Server {
+func New(config Config, logger *logging.Logger, ticketService *ticket.Service, assetService *asset.Service) *Server {
 	// Disabling gin logs
 	gin.SetMode(gin.ReleaseMode)
 
@@ -49,21 +53,26 @@ func New(config Config, ticketService *ticket.Service) *Server {
 
 	return &Server{
 		config:        config,
+		logger:        logger,
 		stdserver:     stdserver,
 		engine:        engine,
 		ticketService: ticketService,
+		assetService:  assetService,
 	}
 }
 func (s *Server) setupRoutes() {
+	s.engine.Use(LoggerMiddleware(s.logger))
+
 	// add metrics and liveness check
 	apiv1 := s.engine.Group("/api/v1")
 
 	ticketsGroup := apiv1.Group("/tickets")
-	ticketsGroup.GET("/", s.GetTickets)
+	ticketsGroup.GET("", s.GetTickets)
+	ticketsGroup.GET("/:id", s.GetTicketByID)
 }
 
 func (s *Server) Run() {
-	log.Println("Running server on ", port)
+	s.logger.Warn("Running webserver", "port", port)
 
 	s.setupRoutes()
 

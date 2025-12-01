@@ -62,7 +62,7 @@ func (s *SQLite) FetchTemplatesByJobType(ctx context.Context, jobType string) ([
 
 	t := template.Template{
 		ID:      "1",
-		JobType: "install_optics_and_connect_two_cenic_devices",
+		JobType: "install_optics_to_connect_two_cenic_devices",
 		Step:    "installation",
 		Content: "example-content:\n A device: {{ device_a_port }}",
 	}

@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	maxSearchResults = 1000
-	allNetTicketsJQL = "project = NET"
+	maxSearchResults = 200
+	allNetTicketsJQL = "project = NET AND status = \"In Progress\" ORDER BY created ASC"
 )
 
 type Config struct {
@@ -35,26 +35,20 @@ func New(config Config) (*Client, error) {
 		return nil, errors.Wrap(err, "can't create Jira client: %v\n")
 	}
 
-	fmt.Printf("Jira client created for user %s\n", config.Username)
-
 	return &Client{client: client}, nil
 }
 
 func (c *Client) FetchTickets(ctx context.Context) ([]ticket.Ticket, error) {
-	fmt.Println("Fetching tickets from Jira")
-
 	options := &jira.SearchOptionsV2{
 		MaxResults: maxSearchResults,
-		Fields:     []string{"summary", "status", "assignee"},
+		Fields:     []string{"summary", "status", "assignee", "description"},
 	}
 
 	issues, resp, err := c.client.Issue.SearchV2JQLWithContext(context.TODO(), allNetTicketsJQL, options)
 	if err != nil {
-		fmt.Printf("Error searching JIRA client: %s\n", err)
 		return nil, errors.Wrap(err, "can't search Jira issues")
 	}
 	if resp.StatusCode != 200 {
-		fmt.Printf("Non-200 response: %d\n", resp.StatusCode)
 		return nil, errors.Errorf("non-200 response from Jira: %d", resp.StatusCode)
 	}
 
@@ -62,7 +56,6 @@ func (c *Client) FetchTickets(ctx context.Context) ([]ticket.Ticket, error) {
 
 	for _, issue := range issues {
 		fmt.Printf("%s:\n", issue.Key)
-		fmt.Printf(" %s:\n", issue.Fields.Summary)
 
 		t := ticket.Ticket{
 			ID:    issue.Key,

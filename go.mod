@@ -1,6 +1,6 @@
 module fossa
 
-go 1.22.6
+go 1.24.4
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -9,6 +9,7 @@ require (
 	github.com/goccy/go-yaml v1.19.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/ncruces/go-sqlite3 v0.20.1
+	github.com/nikolalohinski/gonja/v2 v2.4.2
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.3
 	go.uber.org/zap v1.27.1
@@ -19,6 +20,7 @@ require (
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -42,16 +44,18 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tetratelabs/wazero v1.8.1 // indirect
 	github.com/trivago/tgo v1.0.7 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
+	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

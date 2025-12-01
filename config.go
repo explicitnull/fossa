@@ -9,7 +9,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-const defaultConfFileName = "fossa.yaml"
+const defaultConfFileName = "fossa.yml"
 
 type Config struct {
 	App    AppConfig      `yaml:"app"`

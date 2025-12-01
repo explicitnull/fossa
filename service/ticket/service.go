@@ -3,6 +3,7 @@ package ticket
 import (
 	"context"
 	"fossa/pkg/logging"
+	"fossa/service/asset"
 	"fossa/service/template"
 	"strings"
 
@@ -10,11 +11,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-const delimiterStart = "\nFor automation:"
+const delimiterStart = "\nfor automation:\n"
 
 type Service struct {
 	repository      TicketRepository
 	templateService *template.Service
+	assetService    *asset.Service
 	jiraClient      JiraClient
 }
 
@@ -59,8 +61,6 @@ func (s *Service) FetchTicketsFromJira(ctx context.Context) ([]Ticket, error) {
 		}
 
 		if len(vars) == 0 {
-			logger.Debug("Skipping ticket %s as it does not contain template variables", t.ID)
-
 			continue
 		}
 
@@ -72,17 +72,14 @@ func (s *Service) FetchTicketsFromJira(ctx context.Context) ([]Ticket, error) {
 	return tickets, nil
 }
 
-func (s *Service) parseTicket(ctx context.Context, ticket *Ticket) (map[string]string, error) {
+func (s *Service) parseTicket(ctx context.Context, ticket *Ticket) (map[string]interface{}, error) {
 	des := strings.ToLower(ticket.Description)
 
-	vars := make(map[string]string, 0)
+	vars := make(map[string]interface{}, 0)
 
 	if !strings.Contains(des, delimiterStart) {
 		return vars, nil
 	}
-
-	logger := logging.UnpackContext(ctx)
-	logger.Debug("found automation directive in ticket %s!", ticket.ID)
 
 	yml := strings.Split(des, delimiterStart)[1]
 
@@ -92,4 +89,22 @@ func (s *Service) parseTicket(ctx context.Context, ticket *Ticket) (map[string]s
 	}
 
 	return vars, nil
+}
+
+func (s *Service) GetTicketByID(ctx context.Context, id string) (*Ticket, error) {
+	tkt, err := s.jiraClient.FetchTicketDetails(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "fetch ticket details")
+	}
+
+	vars, err := s.parseTicket(ctx, tkt)
+	if err != nil {
+		return nil, errors.Wrap(err, "parse ticket")
+	}
+
+	if len(vars) != 0 {
+		tkt.TemplateVariables = vars
+	}
+
+	return tkt, nil
 }

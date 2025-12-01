@@ -39,8 +39,6 @@ func main() {
 		logger.Fatal("Can't initialize SQLite")
 	}
 
-	logger.Debug("Jira config: %v", cfg.Jira)
-
 	jiraClient, err := jiraclient.New(cfg.Jira)
 	if err != nil {
 		logger.Fatal("Can't initialize Jira")
@@ -53,7 +51,7 @@ func main() {
 	ticketsService := ticket.NewService(ticketsRepository, templatesService, jiraClient)
 	assetService := asset.NewService(nil, templatesService)
 
-	httpServer := httpserver.New(cfg.HTTPServer, ticketsService)
+	httpServer := httpserver.New(cfg.HTTPServer, logger, ticketsService, assetService)
 
 	go func() {
 		httpServer.Run()

@@ -3,10 +3,13 @@ package asset
 import "fossa/pkg/history"
 
 var Steps = map[string]struct{}{
-	"shipping":      {},
-	"receiving":     {},
-	"installation":  {},
-	"documentation": {},
+	"01 address_confirmation": {},
+	"02 shipping":             {},
+	"03 inbound_shipping":     {},
+	"04 installation":         {},
+	"05 documentation":        {},
+	"06 readiness":            {},
+	"07 decomission":          {},
 }
 
 // business domain entities

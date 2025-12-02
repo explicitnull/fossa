@@ -2,7 +2,6 @@ package jiraclient
 
 import (
 	"context"
-	"fmt"
 	"fossa/service/ticket"
 
 	jira "github.com/andygrunwald/go-jira"
@@ -52,11 +51,11 @@ func (c *Client) FetchTickets(ctx context.Context) ([]ticket.Ticket, error) {
 		return nil, errors.Errorf("non-200 response from Jira: %d", resp.StatusCode)
 	}
 
+	// fmt.Printf("####### FetchTickets(): %d issues from Jira\n", len(issues))
+
 	tt := make([]ticket.Ticket, 0, len(issues))
 
 	for _, issue := range issues {
-		fmt.Printf("%s:\n", issue.Key)
-
 		t := ticket.Ticket{
 			ID:    issue.Key,
 			Title: issue.Fields.Summary,

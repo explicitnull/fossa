@@ -91,6 +91,42 @@ func (s *Service) parseTicket(ctx context.Context, ticket *Ticket) (map[string]i
 	return vars, nil
 }
 
+// GetTickets is used by HTTP server
+func (s *Service) GetTickets(ctx context.Context) ([]Ticket, error) {
+	tickets, err := s.jiraClient.FetchTickets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "can't fetch tickets from Jira")
+	}
+
+	res := make([]Ticket, 0, len(tickets))
+
+	for _, t := range tickets {
+		details, err := s.jiraClient.FetchTicketDetails(ctx, t.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "fetch ticket details")
+		}
+
+		vars, err := s.parseTicket(ctx, details)
+		if err != nil {
+			return nil, errors.Wrap(err, "parse ticket")
+		}
+
+		// Skip tickets without template variables
+		if len(vars) == 0 {
+			continue
+		}
+
+		t.TemplateVariables = vars
+		res = append(res, t)
+
+	}
+
+	// fmt.Printf("######### Fetched %d tickets with template variables\n", len(res))
+
+	return res, nil
+}
+
+// Used by HTTP server
 func (s *Service) GetTicketByID(ctx context.Context, id string) (*Ticket, error) {
 	tkt, err := s.jiraClient.FetchTicketDetails(ctx, id)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fossa/pkg/logging"
 	"fossa/service/asset"
+	"fossa/service/template"
 	"fossa/service/ticket"
 	"log"
 	"net/http"
@@ -34,11 +35,17 @@ type Server struct {
 	stdserver *http.Server
 	engine    *gin.Engine
 
-	ticketService *ticket.Service
-	assetService  *asset.Service
+	ticketService   *ticket.Service
+	assetService    *asset.Service
+	templateService *template.Service
 }
 
-func New(config Config, logger *logging.Logger, ticketService *ticket.Service, assetService *asset.Service) *Server {
+func New(config Config,
+	logger *logging.Logger,
+	ticketService *ticket.Service,
+	assetService *asset.Service,
+	templateService *template.Service,
+) *Server {
 	// Disabling gin logs
 	gin.SetMode(gin.ReleaseMode)
 
@@ -52,12 +59,13 @@ func New(config Config, logger *logging.Logger, ticketService *ticket.Service, a
 	}
 
 	return &Server{
-		config:        config,
-		logger:        logger,
-		stdserver:     stdserver,
-		engine:        engine,
-		ticketService: ticketService,
-		assetService:  assetService,
+		config:          config,
+		logger:          logger,
+		stdserver:       stdserver,
+		engine:          engine,
+		ticketService:   ticketService,
+		assetService:    assetService,
+		templateService: templateService,
 	}
 }
 func (s *Server) setupRoutes() {
@@ -69,6 +77,10 @@ func (s *Server) setupRoutes() {
 	ticketsGroup := apiv1.Group("/tickets")
 	ticketsGroup.GET("", s.GetTickets)
 	ticketsGroup.GET("/:id", s.GetTicketByID)
+
+	templatesGroup := apiv1.Group("/templates")
+	// templatesGroup.GET("/:id", s.GetTemplateByID)
+	templatesGroup.GET("/job_type/:id", s.GetTemplatesByJobType)
 }
 
 func (s *Server) Run() {

@@ -35,7 +35,7 @@ func NewLogger(cfg *Config, appName string) (*Logger, error) {
 
 	zapLogger = zapLogger.With(zap.String("service", appName))
 
-	zapLogger.Info("starting microservice...")
+	zapLogger.Info("Starting microservice...")
 
 	return &Logger{
 		logger: zapLogger.Sugar(),

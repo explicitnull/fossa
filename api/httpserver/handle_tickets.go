@@ -8,28 +8,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GetTicketsResponse struct {
-	Message string
-	Tickets []Ticket
-}
-
-type Ticket struct {
-	ID          int
-	Title       string
-	Description string
-}
-
 func (s *Server) GetTickets(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	tickets, err := s.ticketService.FetchTicketsFromJira(ctx)
+	tickets, err := s.ticketService.GetTickets(ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, c.Error(err))
 
 		return
 	}
 
-	c.JSON(http.StatusOK, tickets)
+	allTicketsDTO := make([]ticketdto.Ticket, 0, len(tickets))
+
+	for _, tkt := range tickets {
+		ticketDTO := ticketdto.Ticket{
+			ID:       tkt.ID,
+			Title:    tkt.Title,
+			Assignee: tkt.Assignee,
+		}
+
+		allTicketsDTO = append(allTicketsDTO, ticketDTO)
+	}
+
+	result := ticketdto.GetTicketsResp{
+		Message: "",
+		Tickets: allTicketsDTO,
+	}
+
+	c.JSON(http.StatusOK, result)
 }
 
 func (s *Server) GetTicketByID(c *gin.Context) {

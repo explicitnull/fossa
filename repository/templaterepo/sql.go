@@ -7,9 +7,9 @@ import (
 	"fossa/service/template"
 )
 
-const (
-	templatesTable = "templates"
-)
+// const (
+// 	templatesTable = "templates"
+// )
 
 type SQLite struct {
 	database *sql.DB

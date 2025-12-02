@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fossa/api/httpserver"
-	"fossa/background/assetrefresher"
 	"fossa/pkg/jiraclient"
 	"fossa/pkg/logging"
 	"fossa/pkg/sqlite"
@@ -44,28 +43,29 @@ func main() {
 		logger.Fatal("Can't initialize Jira")
 	}
 
-	templatesRepository := templaterepo.NewSQLite(sqliteConn)
+	// templatesRepository := templaterepo.NewSQLite(sqliteConn)
+	templatesRepository := templaterepo.NewFileSystem(cfg.Templates.Path)
 	ticketsRepository := ticketrepo.NewSQLite(sqliteConn)
 
 	templatesService := template.NewService(templatesRepository)
 	ticketsService := ticket.NewService(ticketsRepository, templatesService, jiraClient)
 	assetService := asset.NewService(nil, templatesService)
 
-	httpServer := httpserver.New(cfg.HTTPServer, logger, ticketsService, assetService)
+	httpServer := httpserver.New(cfg.HTTPServer, logger, ticketsService, assetService, templatesService)
 
 	go func() {
 		httpServer.Run()
 	}()
 
-	backgroundAssetRefresher := assetrefresher.New(
-		ticketsService,
-		assetService,
-		logger,
-	)
+	// backgroundAssetRefresher := assetrefresher.New(
+	// 	ticketsService,
+	// 	assetService,
+	// 	logger,
+	// )
 
-	go func() {
-		backgroundAssetRefresher.Run(ctx)
-	}()
+	// go func() {
+	// 	backgroundAssetRefresher.Run(ctx)
+	// }()
 
 	<-ctx.Done()
 

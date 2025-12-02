@@ -17,7 +17,8 @@ type Config struct {
 	// Postgres   postgres.Config   `yaml:"postgres"`
 	HTTPServer httpserver.Config `yaml:"http"`
 	// SignIn     security.Config   `yaml:"sign_in"`
-	Jira jiraclient.Config //`env:"jira"`
+	Jira      jiraclient.Config //`env:"jira"`
+	Templates Templates         `yaml:"templates"`
 }
 
 type AppConfig struct {
@@ -25,9 +26,8 @@ type AppConfig struct {
 	Env  string `yaml:"env"`
 }
 
-type Server struct {
-	Host string `yaml:"host"`
-	Port string `yaml:"port"`
+type Templates struct {
+	Path string `yaml:"path"`
 }
 
 func NewConfig(path string) (*Config, error) {

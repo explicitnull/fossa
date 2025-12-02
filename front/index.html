@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>Fetch Ticket</title>
+</head>
+<body>
+    <div id="ticket"></div>
+    <script>
+        fetch('http://0.0.0.0:8080/api/v1/tickets/NET-47')
+            .then(response => response.json())
+            .then(data => {
+                const ticketElement = document.getElementById('ticket');
+                ticketElement.innerHTML = `
+                    <h2>Ticket ${data.ticket.id}</h2>
+                    <p>Title: ${data.ticket.title}</p>
+                    <p>Description: ${data.ticket.description}</p>
+                    <p>Priority: ${data.ticket.priority}</p>
+                `;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

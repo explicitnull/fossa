@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,7 +42,6 @@ type Server struct {
 func New(config Config, logger *logging.Logger, ticketService *ticket.Service, assetService *asset.Service) *Server {
 	// Disabling gin logs
 	gin.SetMode(gin.ReleaseMode)
-
 	engine := gin.New()
 
 	stdserver := &http.Server{
@@ -62,10 +62,15 @@ func New(config Config, logger *logging.Logger, ticketService *ticket.Service, a
 }
 func (s *Server) setupRoutes() {
 	s.engine.Use(LoggerMiddleware(s.logger))
+	s.engine.Use(cors.Default())
 
-	// add metrics and liveness check
 	apiv1 := s.engine.Group("/api/v1")
-
+	s.engine.LoadHTMLGlob("front/*")
+	s.engine.GET("/", func(c *gin.Context) {
+		c.HTML(200, "index.html", gin.H{
+			"title": "Fossa",
+		})
+	})
 	ticketsGroup := apiv1.Group("/tickets")
 	ticketsGroup.GET("", s.GetTickets)
 	ticketsGroup.GET("/:id", s.GetTicketByID)

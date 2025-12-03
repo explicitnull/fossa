@@ -78,6 +78,5 @@ func (s *Server) GetTicketByID(c *gin.Context) {
 	if err == asset.ErrJobTypeNotFound {
 		result.Message = "job_type not found in template variables; no assets generated"
 	}
-
 	c.JSON(http.StatusOK, result)
 }

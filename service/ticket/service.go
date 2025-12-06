@@ -5,13 +5,17 @@ import (
 	"fossa/pkg/logging"
 	"fossa/service/asset"
 	"fossa/service/template"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/goccy/go-yaml"
 	"github.com/pkg/errors"
 )
 
-const delimiterStart = "\nfor automation:\n"
+const delimiterStart = "For automation:\n"
+
+const varsFilePath = "_ticket_vars"
 
 type Service struct {
 	repository      TicketRepository
@@ -73,15 +77,15 @@ func (s *Service) FetchTicketsFromJira(ctx context.Context) ([]Ticket, error) {
 }
 
 func (s *Service) parseTicket(ctx context.Context, ticket *Ticket) (map[string]interface{}, error) {
-	des := strings.ToLower(ticket.Description)
+	// des := strings.ToLower(ticket.Description)
 
 	vars := make(map[string]interface{}, 0)
 
-	if !strings.Contains(des, delimiterStart) {
+	if !strings.Contains(ticket.Description, delimiterStart) {
 		return vars, nil
 	}
 
-	yml := strings.Split(des, delimiterStart)[1]
+	yml := strings.Split(ticket.Description, delimiterStart)[1]
 
 	err := yaml.Unmarshal([]byte(yml), &vars)
 	if err != nil {
@@ -127,10 +131,23 @@ func (s *Service) GetTickets(ctx context.Context) ([]Ticket, error) {
 }
 
 // Used by HTTP server
-func (s *Service) GetTicketByID(ctx context.Context, id string) (*Ticket, error) {
-	tkt, err := s.jiraClient.FetchTicketDetails(ctx, id)
-	if err != nil {
-		return nil, errors.Wrap(err, "fetch ticket details")
+func (s *Service) GetTicketByID(ctx context.Context, id string, varsFromFile bool) (*Ticket, error) {
+	var (
+		tkt *Ticket
+		err error
+	)
+
+	if !varsFromFile {
+
+		tkt, err = s.jiraClient.FetchTicketDetails(ctx, id)
+		if err != nil {
+			return nil, errors.Wrap(err, "fetch ticket details")
+		}
+	} else {
+		tkt, err = s.LoadTicketDescriptionFromFile(ctx, id)
+		if err != nil {
+			log.Printf("can't load ticket description from file: %v", err)
+		}
 	}
 
 	vars, err := s.parseTicket(ctx, tkt)
@@ -143,4 +160,20 @@ func (s *Service) GetTicketByID(ctx context.Context, id string) (*Ticket, error)
 	}
 
 	return tkt, nil
+}
+
+func (s *Service) LoadTicketDescriptionFromFile(ctx context.Context, ticketID string) (*Ticket, error) {
+	filePath := varsFilePath + "/" + ticketID + ".yml"
+
+	fileBytes, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	t := &Ticket{
+		ID:          ticketID,
+		Description: string(fileBytes),
+	}
+
+	return t, nil
 }

@@ -36,3 +36,4 @@ go.work.sum
 go.sum
 db/
 fossa
+_ticket_vars/

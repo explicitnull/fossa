@@ -7,9 +7,11 @@ var Steps = map[string]struct{}{
 	"02 shipping":             {},
 	"03 inbound_shipping":     {},
 	"04 installation":         {},
-	"05 documentation":        {},
-	"06 readiness":            {},
-	"07 decomission":          {},
+	"05 conf_calendar":        {},
+	"06 migration":            {},
+	"07 documentation":        {},
+	"08 readiness":            {},
+	"09 decomission":          {},
 }
 
 // business domain entities

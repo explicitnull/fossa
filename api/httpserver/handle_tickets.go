@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"fossa/pkg/dto/assetdto"
 	"fossa/pkg/ticketdto"
 	"fossa/service/asset"
 	"net/http"
@@ -43,7 +44,13 @@ func (s *Server) GetTicketByID(c *gin.Context) {
 
 	ticketID := c.Param("id")
 
-	tkt, err := s.ticketService.GetTicketByID(ctx, ticketID)
+	var varsFromFile bool
+
+	if c.Query("from_file") == "yes" {
+		varsFromFile = true
+	}
+
+	tkt, err := s.ticketService.GetTicketByID(ctx, ticketID, varsFromFile)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, c.Error(err))
 
@@ -57,9 +64,9 @@ func (s *Server) GetTicketByID(c *gin.Context) {
 	}
 
 	// sending response
-	assetsDTO := make([]ticketdto.Asset, 0, len(assets))
+	assetsDTO := make([]assetdto.Asset, 0, len(assets))
 	for step, asset := range assets {
-		assetsDTO = append(assetsDTO, ticketdto.Asset{
+		assetsDTO = append(assetsDTO, assetdto.Asset{
 			Step:    step,
 			Content: asset.Content,
 		})

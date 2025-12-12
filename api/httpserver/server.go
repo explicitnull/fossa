@@ -73,19 +73,25 @@ func (s *Server) setupRoutes() {
 	s.engine.Use(cors.Default())
 
 	apiv1 := s.engine.Group("/api/v1")
-	s.engine.LoadHTMLGlob("front/*")
-	s.engine.GET("/", func(c *gin.Context) {
-		c.HTML(200, "index.html", gin.H{
-			"title": "Fossa",
-		})
-	})
+
 	ticketsGroup := apiv1.Group("/tickets")
 	ticketsGroup.GET("", s.GetTickets)
-	ticketsGroup.GET("/:id", s.GetTicketByID)
+
+	ticketGroup := apiv1.Group("/ticket")
+	ticketGroup.GET("", s.GetTicketByID)
 
 	templatesGroup := apiv1.Group("/templates")
 	// templatesGroup.GET("/:id", s.GetTemplateByID)
 	templatesGroup.GET("/job_type/:id", s.GetTemplatesByJobType)
+
+	// s.engine.LoadHTMLGlob("spa/*")
+	// s.engine.GET("/", func(c *gin.Context) {
+	// 	c.HTML(200, "index.html", gin.H{
+	// 		"title": "Infrastructure Automation Tool",
+	// 	})
+	// })
+
+	// s.engine.Static("/spa/", "./spa/")
 }
 
 func (s *Server) Run() {

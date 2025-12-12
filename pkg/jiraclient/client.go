@@ -10,7 +10,6 @@ import (
 
 const (
 	maxSearchResults = 200
-	allNetTicketsJQL = "project = NET AND status = \"In Progress\" ORDER BY created ASC"
 )
 
 type Config struct {
@@ -37,13 +36,13 @@ func New(config Config) (*Client, error) {
 	return &Client{client: client}, nil
 }
 
-func (c *Client) FetchTickets(ctx context.Context) ([]ticket.Ticket, error) {
+func (c *Client) FetchTickets(ctx context.Context, query string) ([]ticket.Ticket, error) {
 	options := &jira.SearchOptionsV2{
 		MaxResults: maxSearchResults,
 		Fields:     []string{"summary", "status", "assignee", "description"},
 	}
 
-	issues, resp, err := c.client.Issue.SearchV2JQLWithContext(context.TODO(), allNetTicketsJQL, options)
+	issues, resp, err := c.client.Issue.SearchV2JQLWithContext(context.TODO(), query, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't search Jira issues")
 	}

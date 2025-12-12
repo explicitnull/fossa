@@ -5,6 +5,6 @@ import (
 )
 
 type JiraClient interface {
-	FetchTickets(ctx context.Context) ([]Ticket, error)
+	FetchTickets(ctx context.Context, query string) ([]Ticket, error)
 	FetchTicketDetails(ctx context.Context, ticketID string) (*Ticket, error)
 }

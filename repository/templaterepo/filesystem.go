@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"fossa/service/asset"
 	"fossa/service/template"
 )
 
@@ -26,7 +25,7 @@ func (s *FileSystem) FetchTemplatesByJobType(ctx context.Context, jobType string
 
 	results := []template.Template{}
 
-	for step := range asset.Steps {
+	for _, step := range template.Steps {
 		jobFilename := s.templatesPath + "/" + jobType + "/" + step + ".j2"
 		// fmt.Printf("@@@@@ filename: %s\n", jobFilename)
 
@@ -68,7 +67,7 @@ func (s *FileSystem) FetchTemplatesByJobType(ctx context.Context, jobType string
 
 		results = append(results, t)
 
-		// fmt.Printf("+++++ loaded template for step %s with len %d\n", step, len(fileBytes))
+		fmt.Printf("+++++ loaded template for step %s with len %d\n", step, len(fileBytes))
 
 	}
 

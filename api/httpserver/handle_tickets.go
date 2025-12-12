@@ -1,9 +1,11 @@
 package httpserver
 
 import (
+	"errors"
 	"fossa/pkg/dto/assetdto"
 	"fossa/pkg/ticketdto"
 	"fossa/service/asset"
+	"fossa/service/template"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +14,14 @@ import (
 func (s *Server) GetTickets(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	tickets, err := s.ticketService.GetTickets(ctx)
+	assignedTo, err := mapAssignee(c.Query("assigned_to"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, c.Error(err))
+
+		return
+	}
+
+	tickets, err := s.ticketService.GetTickets(ctx, assignedTo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, c.Error(err))
 
@@ -42,10 +51,9 @@ func (s *Server) GetTickets(c *gin.Context) {
 func (s *Server) GetTicketByID(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	ticketID := c.Param("id")
+	ticketID := c.Query("key")
 
 	var varsFromFile bool
-
 	if c.Query("from_file") == "yes" {
 		varsFromFile = true
 	}
@@ -65,10 +73,16 @@ func (s *Server) GetTicketByID(c *gin.Context) {
 
 	// sending response
 	assetsDTO := make([]assetdto.Asset, 0, len(assets))
-	for step, asset := range assets {
+
+	for _, stepName := range template.Steps {
+		stepAsset, exist := assets[stepName]
+		if !exist {
+			continue
+		}
+
 		assetsDTO = append(assetsDTO, assetdto.Asset{
-			Step:    step,
-			Content: asset.Content,
+			Step:    template.HumanReadableSteps[stepName],
+			Content: stepAsset.Content,
 		})
 	}
 
@@ -78,12 +92,29 @@ func (s *Server) GetTicketByID(c *gin.Context) {
 			ID:          tkt.ID,
 			Title:       tkt.Title,
 			Description: tkt.Description,
-			Assets:      assetsDTO,
 		},
+		Assets: assetsDTO,
 	}
 
 	if err == asset.ErrJobTypeNotFound {
 		result.Message = "job_type not found in template variables; no assets generated"
 	}
 	c.JSON(http.StatusOK, result)
+}
+
+func mapAssignee(URLparam string) (string, error) {
+	switch URLparam {
+	case "Abdel":
+		return "Abdelrahman Mohammad", nil
+	case "Alaa":
+		return "Alaa Shaheen", nil
+	case "Dmitrii":
+		return "Dmitrii Zhargalov", nil
+	case "Jose":
+		return "Jose Gonzalez", nil
+	case "":
+		return "", nil
+	}
+
+	return "", errors.New("assignee name not found")
 }

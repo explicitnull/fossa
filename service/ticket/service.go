@@ -2,6 +2,7 @@ package ticket
 
 import (
 	"context"
+	"fmt"
 	"fossa/pkg/logging"
 	"fossa/service/asset"
 	"fossa/service/template"
@@ -13,9 +14,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-const delimiterStart = "For automation:\n"
+// yaml processing
+const (
+	delimiterStart = "For automation:\n"
+	mainTicket     = "main_ticket"
+	varsFilePath   = "_ticket_vars"
+)
 
-const varsFilePath = "_ticket_vars"
+const (
+	allNetInProgress           = "project = NET AND status = \"In Progress\" ORDER BY created ASC"
+	allNetInProgressAssignedTo = "project = NET AND status = \"In Progress\" AND assignee = \"%s\" ORDER BY created ASC"
+)
 
 type Service struct {
 	repository      TicketRepository
@@ -48,7 +57,7 @@ func NewService(
 func (s *Service) FetchTicketsFromJira(ctx context.Context) ([]Ticket, error) {
 	logger := logging.UnpackContext(ctx)
 
-	tickets, err := s.jiraClient.FetchTickets(ctx)
+	tickets, err := s.jiraClient.FetchTickets(ctx, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "can't fetch tickets from Jira")
 	}
@@ -96,8 +105,16 @@ func (s *Service) parseTicket(ctx context.Context, ticket *Ticket) (map[string]i
 }
 
 // GetTickets is used by HTTP server
-func (s *Service) GetTickets(ctx context.Context) ([]Ticket, error) {
-	tickets, err := s.jiraClient.FetchTickets(ctx)
+func (s *Service) GetTickets(ctx context.Context, engineerName string) ([]Ticket, error) {
+	var query string
+	if engineerName != "" {
+		query = fmt.Sprintf(allNetInProgressAssignedTo, engineerName)
+	} else {
+		// TODO: slow - use cache or refresh in background or rewrite JQL string
+		query = allNetInProgress
+	}
+
+	tickets, err := s.jiraClient.FetchTickets(ctx, query)
 	if err != nil {
 		return nil, errors.Wrap(err, "can't fetch tickets from Jira")
 	}
@@ -156,6 +173,7 @@ func (s *Service) GetTicketByID(ctx context.Context, id string, varsFromFile boo
 	}
 
 	if len(vars) != 0 {
+		vars[mainTicket] = id
 		tkt.TemplateVariables = vars
 	}
 
